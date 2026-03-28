@@ -2,8 +2,7 @@ package main
 
 import (
 	"executor/middleware"
-     	"log"
-	
+     	
 
 	"github.com/joho/godotenv"
 	"github.com/gin-gonic/gin"
@@ -11,10 +10,7 @@ import (
 
 func main() {
 	
-		err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+    _ = godotenv.Load()
 
 	r := gin.Default()
 

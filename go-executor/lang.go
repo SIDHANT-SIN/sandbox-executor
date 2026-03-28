@@ -12,7 +12,7 @@ var langs = map[string]Lang{
         Img:  "gcc",
         File: "code.cpp",
         CompileCmd: []string{
-            "bash", "-c", "g++ /code/code.cpp -o /code/out",
+            "bash", "-c", "g++ /code/code.cpp -o /code/out && chmod +x /code/out",
         },
         RunCmd: []string{
             "bash", "-c", "timeout 2s /code/out",
@@ -23,14 +23,14 @@ var langs = map[string]Lang{
         File: "code.py",
         CompileCmd: nil,
         RunCmd: []string{
-            "bash", "-c", "timeout 2s python /code/code.py",
+            "bash", "-c", "chmod +r /code/code.py && timeout 2s python /code/code.py",
         },
     },
     "java": {
     Img:  "eclipse-temurin",
     File: "Main.java",
     CompileCmd: []string{
-            "javac", "/code/Main.java",
+            "bash", "-c", "javac /code/Main.java && chmod +x /code/*.class",
         },
     RunCmd: []string{
             "bash", "-c",

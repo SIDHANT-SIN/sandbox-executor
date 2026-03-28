@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"math/rand"
 	"sync"
 	"time"
 
@@ -9,54 +8,56 @@ import (
 )
 
 type userData struct {
-	lastRequest time.Time
-	failures    int
+	tokens     float64
+	lastRefill time.Time
 }
 
 var (
-	userLocks = make(map[string]*userData)
-	mu        sync.Mutex
+	users = make(map[string]*userData)
+	mu    sync.Mutex
 )
 
 func RateLimitMiddleware() gin.HandlerFunc {
-	const maxFailures = 5
+	const (
+		capacity   = 5.0 // max burst (5 instant requests)
+		refillRate = 2.0 // tokens per second
+	)
 
 	return func(c *gin.Context) {
-		user := c.ClientIP() 
+		user := c.ClientIP() // ✅ using IP only (as you wanted)
 
 		mu.Lock()
-		data, exists := userLocks[user]
-		if !exists {
-			data = &userData{}
-			userLocks[user] = data
-		}
-
-		// exponential backoff up
-		wait := 1 * time.Second
-		if data.failures > 0 && data.failures <= maxFailures {
-			wait = time.Duration(1<<data.failures) * time.Second 
-		}
-
-		// jitter
-		wait += time.Duration(rand.Intn(500)) * time.Millisecond
-
-		if time.Since(data.lastRequest) < wait {
-			if data.failures < maxFailures {
-				data.failures++
+		data, ok := users[user]
+		if !ok {
+			data = &userData{
+				tokens:     capacity,
+				lastRefill: time.Now(),
 			}
+			users[user] = data
+		}
+
+		now := time.Now()
+		elapsed := now.Sub(data.lastRefill).Seconds()
+
+		// refill tokens
+		data.tokens += elapsed * refillRate
+		if data.tokens > capacity {
+			data.tokens = capacity
+		}
+		data.lastRefill = now
+
+		// check limit
+		if data.tokens < 1 {
 			mu.Unlock()
 			c.JSON(429, gin.H{
-				"error":    "Rate limit exceeded",
-				"retryIn":  wait.Seconds(),
-				"failures": data.failures,
+				"error": "rate limit exceeded",
 			})
 			c.Abort()
 			return
 		}
 
-		// Successful request
-		data.lastRequest = time.Now()
-		data.failures = 0
+		// consume token
+		data.tokens -= 1
 		mu.Unlock()
 
 		c.Next()

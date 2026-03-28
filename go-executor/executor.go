@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"time"
+	"fmt"
 )
 
 func execute(req Req) Resp {
@@ -19,6 +20,12 @@ func execute(req Req) Resp {
 	if err != nil {
 		return Resp{Error: "file write error", Status: "error"}
 	}
+
+	files, _ := os.ReadDir(dir)
+    fmt.Println("Files written in temp dir:", dir)
+    for _, f := range files {
+         fmt.Println("-", f.Name())
+}
 
 	// COMPILE (with safety timeout)
 	if lang.CompileCmd != nil {
@@ -71,7 +78,7 @@ func execute(req Req) Resp {
 
 	if err != nil {
 		return Resp{
-			Error:  out,
+			Error:  err.Error(),
 			Status: "runtime_error",
 		}
 	}
