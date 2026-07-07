@@ -3,11 +3,15 @@ package middleware
 import (
 	"net/http"
 	"os"
-
+    "log"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
+	if err := godotenv.Load("go-executor/.env"); err != nil {
+		log.Printf("Warning: could not load .env file: %v", err)
+	}
 	secret := os.Getenv("SECRET_KEY");
 
 	return func(c *gin.Context) {

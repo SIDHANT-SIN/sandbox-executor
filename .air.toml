@@ -1,0 +1,11 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "cmd /C \"cd go-executor && go build -o ../tmp/main.exe .\""
+bin = "tmp/main.exe"
+include_ext = ["go"]
+exclude_dir = ["tmp", "vendor"]
+
+[log]
+time = true
