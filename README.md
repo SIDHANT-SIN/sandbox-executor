@@ -84,7 +84,7 @@
     <li>Clone the repo</li>
     <li>Create a <code>.env</code> file with required secrets (look into .env.example)</li>
     <li>Run the server:
-        <pre><code>go run main.go</code></pre>
+        <pre><code>air</code></pre>
     </li>
     <li>Call the <code>/execute</code> endpoint with code and language parameters, including the authorization header</li>
 </ol>
@@ -95,8 +95,9 @@ Authorization: Bearer YOUR_SECRET_KEY
 Content-Type: application/json
 
 {
-  "language": "python",
+  "lang": "python",
   "code": "print('Hello World')"
+  "problem_id": "print_hello"
 }
 </code></pre>
 
