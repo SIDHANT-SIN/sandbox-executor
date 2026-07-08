@@ -36,10 +36,10 @@ var langs = map[string]Lang{
 		Img:  "gcc",
 		File: "code.cpp",
 		CompileCmd: []string{
-			"bash", "-c", "g++ /code/code.cpp -o /code/out && chmod +x /code/out",
+			"bash", "-c", "g++ /code/code.cpp -o /code/out",
 		},
 		RunCmd: []string{
-			"bash", "-c", "timeout 2s /code/out",
+			"bash", "-c", "cp /code/out /tmp/out && chmod +x /tmp/out && timeout 2s /tmp/out",
 		},
 	},
 	"python": {

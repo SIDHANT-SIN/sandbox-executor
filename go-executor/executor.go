@@ -35,7 +35,16 @@ func execute(req Req) Resp {
 	fmt.Println("Test input loaded, length:", len(testInput))
 	fmt.Println("Expected output loaded, length:", len(expectedOutput))
 
-	dir, _ := os.MkdirTemp("", "exec-*")
+	baseDir := os.Getenv("CODE_SHARED_DIR")
+	if baseDir == "" {
+		baseDir = os.TempDir() 
+	}
+
+	dir, err := os.MkdirTemp(baseDir, "exec-*")
+	if err != nil {
+		fmt.Println("ERROR: failed to create temp dir:", err)
+		return Resp{Error: "infrastructure error", Status: "error"}
+	}
 	defer os.RemoveAll(dir)
 
 	err = writeCode(dir, lang.File, req.Code)
@@ -51,9 +60,7 @@ func execute(req Req) Resp {
 	}
 
 	if lang.CompileCmd != nil {
-
 		out, err, status := runDocker(dir, lang.Img, lang.CompileCmd, 10*time.Second, "")
-
 		if status == "infra_timeout" {
 			fmt.Println("ERROR: compilation timed out")
 			return Resp{
@@ -61,7 +68,6 @@ func execute(req Req) Resp {
 				Status: "compile_timeout",
 			}
 		}
-
 		if err != nil {
 			fmt.Println("ERROR: compile error:", out)
 			return Resp{
@@ -126,7 +132,6 @@ func execute(req Req) Resp {
 	}
 }
 
-
 func compareOutput(actual, expected string) bool {
 	actualLines := splitLines(actual)
 	expectedLines := splitLines(expected)
@@ -158,7 +163,6 @@ func splitLines(s string) []string {
 }
 
 func runDocker(dir, img string, cmd []string, t time.Duration, stdin string) (string, error, string) {
-
 	fmt.Println("START runDocker : - ")
 
 	//  DinD check
@@ -188,7 +192,6 @@ func runDocker(dir, img string, cmd []string, t time.Duration, stdin string) (st
 	fmt.Println("STDIN LENGTH:", len(stdin))
 	fmt.Println("FULL ARGS:", args)
 
-	// Context setup
 	var ctx context.Context
 	var cancel context.CancelFunc
 
@@ -201,7 +204,6 @@ func runDocker(dir, img string, cmd []string, t time.Duration, stdin string) (st
 	}
 	defer cancel()
 
-	//Execute docker
 	fmt.Println("=== EXECUTING DOCKER COMMAND ===")
 	c := exec.CommandContext(ctx, "docker", args...)
 	c.Stdin = strings.NewReader(stdin)
@@ -212,15 +214,12 @@ func runDocker(dir, img string, cmd []string, t time.Duration, stdin string) (st
 	fmt.Println("OUTPUT:\n", string(out))
 	fmt.Println("ERROR:", err)
 
-	// Timeout check
 	if ctx.Err() == context.DeadlineExceeded {
 		fmt.Println("TIMEOUT HIT")
 		return "", ctx.Err(), "infra_timeout"
 	}
 
-	// Error classification
 	if err != nil {
-
 		fmt.Println("=== ERROR ANALYSIS ===")
 		fmt.Println("RAW ERROR:", err)
 
@@ -242,7 +241,6 @@ func runDocker(dir, img string, cmd []string, t time.Duration, stdin string) (st
 			}
 		}
 
-		// show actual output
 		fmt.Println("RUNTIME ERROR DETECTED")
 		return string(out), err, "runtime_error"
 	}

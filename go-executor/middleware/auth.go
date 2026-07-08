@@ -2,17 +2,19 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	
 	"log"
 	"net/http"
 	"os"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
-	if err := godotenv.Load("go-executor/.env"); err != nil {
-		log.Printf("Warning: could not load .env file: %v", err)
-	}
 	secret := os.Getenv("SECRET_KEY")
+	
+	if secret == "" {
+		log.Println("WARNING: SECRET_KEY is empty! Check your .env file or docker-compose config.")
+	}
+
 
 	return func(c *gin.Context) {
 		auth := c.GetHeader("Authorization")
