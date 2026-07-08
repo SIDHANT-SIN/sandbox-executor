@@ -1,4 +1,3 @@
-# ---------- Builder ----------
 FROM golang:1.26-alpine AS builder
 WORKDIR /app
 
@@ -11,20 +10,18 @@ RUN go mod download
 # Copy the source code
 COPY go-executor/ .
 
-# BUILD the binary here. This creates a file named 'server'
-RUN go build -o server .
+# Build a static binary
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o server .
 
-# ---------- Runtime ----------
-FROM golang:1.26-alpine
+FROM alpine:3.20
 WORKDIR /app
 
-# Install docker-cli so the Go binary can talk to the host socket
-RUN apk add --no-cache git docker-cli
+# Only docker-cli — the Go binary needs this to talk to the host's docker.sock
+RUN apk add --no-cache docker-cli
 
 # Copy ONLY the compiled binary from the builder stage
 COPY --from=builder /app/server .
 
-EXPOSE 8080
+EXPOSE 8050
 
-# Run the binary directly (No more 'go run'!)
 CMD ["./server"]
