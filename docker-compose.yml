@@ -6,19 +6,23 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: go_executor
-    ports:
-      - "8050:8050"
-    
+
     env_file:
-      - ./go-executor/.env
-    
-    # This injects the path your Go code needs to create the temp folders
+      - ./go-executor/.env          
+
     environment:
       - CODE_SHARED_DIR=/tmp/executor
-      
+
     volumes:
-      # The socket connection to talk to your laptop's Docker daemon
       - /var/run/docker.sock:/var/run/docker.sock
-      
-      # The shared folder map so the host and container share the exact same paths
       - /tmp/executor:/tmp/executor
+
+    networks:
+      - secure_net
+
+    restart: unless-stopped
+
+networks:
+  secure_net:
+    external: true
+    name: interview_tier_network
