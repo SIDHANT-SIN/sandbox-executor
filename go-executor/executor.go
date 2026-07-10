@@ -60,7 +60,7 @@ func execute(req Req) Resp {
 	}
 
 	if lang.CompileCmd != nil {
-		out, err, status := runDocker(dir, lang.Img, lang.CompileCmd, 30*time.Second, "")
+		out, err, status := runDocker(dir, lang.Img, lang.CompileCmd, 70*time.Second, "")
 		if status == "infra_timeout" {
 			fmt.Println("ERROR: compilation timed out")
 			return Resp{

@@ -39,7 +39,7 @@ var langs = map[string]Lang{
 			"bash", "-c", "g++ /code/code.cpp -o /code/out",
 		},
 		RunCmd: []string{
-			"bash", "-c", "cp /code/out /tmp/out && chmod +x /tmp/out && timeout 2s /tmp/out",
+			"bash", "-c", "cp /code/out /tmp/out && chmod +x /tmp/out && timeout 10s /tmp/out",
 		},
 	},
 	"python": {
@@ -47,7 +47,7 @@ var langs = map[string]Lang{
 		File:       "code.py",
 		CompileCmd: nil,
 		RunCmd: []string{
-			"bash", "-c", "chmod +r /code/code.py && timeout 2s python /code/code.py",
+			"bash", "-c", "chmod +r /code/code.py && timeout 10s python /code/code.py",
 		},
 	},
 	"java": {
@@ -58,7 +58,7 @@ var langs = map[string]Lang{
 		},
 		RunCmd: []string{
 			"bash", "-c",
-			"timeout 2s java -Xms32m -Xmx64m -cp /code Main",
+			"timeout 10s java -Xms32m -Xmx64m -cp /code Main",
 		},
 	},
 }
