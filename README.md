@@ -2,6 +2,15 @@
 <h1>Sandbox Executor</h1>
 <p><strong>Repo:</strong> sandbox-executor | Built in Go | Multi-language code execution (Python, C++, Java)</p>
 
+<h2>Project Context</h2>
+<p>
+    This repository is a secure, standalone <strong>Sandbox Code Executor</strong> designed for the 
+    <a href="https://github.com/SIDHANT-SIN/AI-based-Interview-App">AI-based-Interview-App</a>. 
+    It functions as a containerized sandbox that compiles and executes user-submitted code in isolation. 
+    This service receives requests from the main application, handles secure code execution, 
+    and returns the results for real-time evaluation.
+</p>
+
 <h2>Overview</h2>
 <p>Sandbox Executor is a secure and efficient backend service for executing code in multiple languages. It runs Python, C++, and Java programs inside isolated Docker containers to ensure system safety and concurrency control.</p>
 
@@ -84,7 +93,7 @@
     <li>Clone the repo</li>
     <li>Create a <code>.env</code> file with required secrets (look into .env.example)</li>
     <li>Run the server:
-        <pre><code>go run main.go</code></pre>
+        <pre><code>air</code></pre>
     </li>
     <li>Call the <code>/execute</code> endpoint with code and language parameters, including the authorization header</li>
 </ol>
@@ -95,8 +104,9 @@ Authorization: Bearer YOUR_SECRET_KEY
 Content-Type: application/json
 
 {
-  "language": "python",
+  "lang": "python",
   "code": "print('Hello World')"
+  "problem_id": "print_hello"
 }
 </code></pre>
 
